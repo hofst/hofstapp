@@ -4,7 +4,7 @@ __author__ = 'Basti'
 from feedly import FeedlyClient
 import stopwords
 from gluon.storage import Storage
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
 from google.appengine.api import taskqueue
@@ -16,8 +16,8 @@ memcache = memcache.Client(pickleProtocol=1)
 FEEDLY_REDIRECT_URI = "http://localhost"
 FEEDLY_CLIENT_ID="sandbox"
 FEEDLY_CLIENT_SECRET="ES3R6KCEG46BW9MYD332"
-FEEDLY_ACCESS_TOKEN="AjaGzax7ImEiOiJGZWVkbHkgRGV2ZWxvcGVyIiwiZSI6MTQxMTgxMTU2MDIxOSwiaSI6IjUwZjJiYzYxLTkwY2QtNDcwNC1iNmJhLWY2N2UyZTg2MThiNCIsInAiOjYsInQiOjEsInYiOiJwcm9kdWN0aW9uIiwieCI6InN0YW5kYXJkIn0:feedlydev"  # sebastian@hofst.com
-# FEEDLY_ACCESS_TOKEN = "AjPNcgp7ImEiOiJGZWVkbHkgRGV2ZWxvcGVyIiwiZSI6MTQxMTc2NTg1ODE2OSwiaSI6ImY2ZmI4ZWEzLTBjNDItNDMwYy04M2RkLWM0MzViNThjYzMyZCIsInAiOjYsInQiOjEsInYiOiJwcm9kdWN0aW9uIiwieCI6InN0YW5kYXJkIn0:feedlydev"  # basti@katseb.de
+#FEEDLY_ACCESS_TOKEN="AjaGzax7ImEiOiJGZWVkbHkgRGV2ZWxvcGVyIiwiZSI6MTQxMTgxMTU2MDIxOSwiaSI6IjUwZjJiYzYxLTkwY2QtNDcwNC1iNmJhLWY2N2UyZTg2MThiNCIsInAiOjYsInQiOjEsInYiOiJwcm9kdWN0aW9uIiwieCI6InN0YW5kYXJkIn0:feedlydev"  # sebastian@hofst.com
+FEEDLY_ACCESS_TOKEN = "AjPNcgp7ImEiOiJGZWVkbHkgRGV2ZWxvcGVyIiwiZSI6MTQxMTc2NTg1ODE2OSwiaSI6ImY2ZmI4ZWEzLTBjNDItNDMwYy04M2RkLWM0MzViNThjYzMyZCIsInAiOjYsInQiOjEsInYiOiJwcm9kdWN0aW9uIiwieCI6InN0YW5kYXJkIn0:feedlydev"  # basti@katseb.de
 # FEEDLY_ACCESS_TOKEN = ""
 
 if FEEDLY_ACCESS_TOKEN:
@@ -39,13 +39,14 @@ class News(ndb.Model):
     link = ndb.StringProperty()
     author = ndb.StringProperty()
     pubDate = ndb.DateTimeProperty()
+    crawled = ndb.DateTimeProperty()
     unread = ndb.BooleanProperty()
     keywords = ndb.StringProperty(repeated=True)
     image = ndb.StringProperty()
 
     @staticmethod
     def QUERY():
-        return News.query(News.datetime > datetime.now() - timedelta(days=2)).order(-News.datetime)
+        return News.query(News.crawled > datetime.now() - timedelta(days=2)).order(-News.pubDate)
 
     @staticmethod
     def from_dict(dic):
@@ -59,6 +60,7 @@ class News(ndb.Model):
             link = dic.alternate[0]["href"] if dic.alternate else "",
             author = dic.author,
             pubDate = datetime(1970, 1, 1) + timedelta(milliseconds=dic.published),
+            crawled = datetime(1970, 1, 1) + timedelta(milliseconds=dic.crawled),
             unread = dic.unread,
             keywords = dic.keywords if dic.keywords else [],
             image = dic.enclosure[0]["href"] if dic.enclosure else dic.visual["url"] if dic.visual else ""

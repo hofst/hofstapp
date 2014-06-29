@@ -5,7 +5,7 @@
     <title>Hofstapp Feeds</title>
     <link>http://hofst.com</link>
     <description>Better than Feedly!</description>
-    <pubDate>{{=datetime.now()}}</pubDate>
+    <pubDate>{{=datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}}</pubDate>
     {{for n in news:}}
         <item>
             <title>{{=n.title}}</title>
@@ -13,8 +13,7 @@
             <link>{{=n.link}}</link>
             <author>{{=n.author}}</author>
             <guid>{{=n.key.id()}}</guid>
-            <pubDate>{{=n.pubDate}}</pubDate>
-            <unread>{{=n.unread}}</unread>
+            <pubDate>{{=n.pubDate.strftime("%Y-%m-%dT%H:%M:%S")}}</pubDate>
             <image>{{=n.image}}</image>
         </item>
     {{pass}}
