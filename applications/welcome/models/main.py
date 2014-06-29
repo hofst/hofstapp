@@ -3,7 +3,10 @@ __author__ = 'Basti'
 from feedly import FeedlyClient
 from gluon.storage import Storage
 from datetime import datetime, timedelta
+from google.appengine.api import memcache
 import logging
+memcache = memcache.Client(pickleProtocol=1)
+
 
 FEEDLY_REDIRECT_URI = "http://localhost"
 FEEDLY_CLIENT_ID="sandbox"

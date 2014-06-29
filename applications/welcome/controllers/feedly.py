@@ -21,21 +21,10 @@ def index():
         else:
             feedly_client.access_token = request.vars.access_token
 
-    feeds = [Storage(feed) for feed in feedly_client.get_user_subscriptions()][:2]
-    for feed in feeds:
-        feed.pubDate = datetime(1, 1, 1) + timedelta(microseconds=feed.updated)
-        feed_items = [Storage(item) for item in feedly_client.get_feed_content(feed.id)["items"]]
-        feed.feed_items = []
-        for item in feed_items:
-            new_item = Storage()
-            new_item.title = item.title
-            new_item.content = item.summary.get("content")
-            new_item.link = item.alternate[0]["href"] if item.alternate else ""
-            new_item.author = item.author
-            new_item.guid = item.id
-            new_item.pubDate = datetime(1, 1, 1) + timedelta(microseconds=item.published)
-            new_item.unread = item.unread
-            new_item.keywords = item.keywords
-            new_item.image = item.enclosure[0]["href"] if item.enclosure else item.visual["url"] if item.visual else ""
-            feed.feed_items += [new_item]
+
+    feeds = memcache.get("feeds")
+    if not feeds:
+        feeds = feedly_client.get_user_subscriptions()
+        memcache.set("feeds", feeds)
+
     return dict(feeds=feeds)
