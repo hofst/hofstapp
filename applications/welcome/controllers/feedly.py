@@ -21,10 +21,4 @@ def index():
         else:
             feedly_client.access_token = request.vars.access_token
 
-
-    feeds = memcache.get("feeds")
-    if not feeds:
-        feeds = feedly_client.get_user_subscriptions()
-        memcache.set("feeds", feeds)
-
-    return dict(feeds=feeds)
+    return dict(news=News.get())

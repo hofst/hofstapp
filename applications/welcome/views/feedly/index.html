@@ -2,24 +2,21 @@
 
 <rss version="2.0">
 <channel>
-    <title>{{=feeds[0].title}}</title>
-    <link>{{=feeds[0].website}}</link>
-    <description>{{=feeds[0].title}}</description>
-    <pubDate>{{=feeds[0].pubDate}}</pubDate>
-    {{for feed in feeds:}}
-            {{for item in feed.feed_items:}}
-                <item>
-                    <title>{{=item.title}}</title>
-                    <description>{{=item.content}}</description>
-                    <link>{{=item.link}}</link>
-                    <author>{{=item.author}}</author>
-                    <guid>{{=item.guid}}</guid>
-                    <pubDate>{{=item.pubDate}}</pubDate>
-                    <unread>{{=item.unread}}</unread>
-                    <keywords>{{=",".join(item.keywords)}}</keywords>
-                    <image>{{=item.image}}</image>
-                </item>
-            {{pass}}
+    <title>Hofstapp Feeds</title>
+    <link>http://hofst.com</link>
+    <description>Better than Feedly!</description>
+    <pubDate>{{=datetime.now()}}</pubDate>
+    {{for n in news:}}
+        <item>
+            <title>{{=n.title}}</title>
+            <description>{{=n.content}}</description>
+            <link>{{=n.link}}</link>
+            <author>{{=n.author}}</author>
+            <guid>{{=n.key.id()}}</guid>
+            <pubDate>{{=n.pubDate}}</pubDate>
+            <unread>{{=n.unread}}</unread>
+            <image>{{=n.image}}</image>
+        </item>
     {{pass}}
 </channel>
 </rss>

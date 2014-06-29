@@ -33,7 +33,7 @@ class FeedlyClient(object):
     
     def get_access_token(self,redirect_uri,code):
         if self.access_token:
-            return self.access_token
+            return Storage(access_token=self.access_token)
         params = dict(
                       client_id=self.client_id,
                       client_secret=self.client_secret,
@@ -60,57 +60,53 @@ class FeedlyClient(object):
         res = requests.post(url=quest_url, params=params)
         return res.json()
 
-    def get_user_subscriptions(self):
+    def get_subscriptions(self):
         '''return list of user subscriptions'''
-        headers = {'Authorization': 'OAuth '+ self.access_token}
+        headers = {'Authorization': 'OAuth ' + self.access_token}
         quest_url = self._get_endpoint('v3/subscriptions')
         res = requests.get(url=quest_url, headers=headers).json()
+        if "errorCode" in res:
+            raise Exception(res["errorMessage"])
 
-        feeds = [Storage(feed) for feed in res][:2]
+        return [Storage(feed) for feed in res]
+
+    def get_news_dics(self, **kwargs):
+        news_dics = []
+        feeds = self.get_subscriptions()
         for feed in feeds:
-            feed.pubDate = datetime(1, 1, 1) + timedelta(microseconds=feed.updated)
-            feed_items = [Storage(item) for item in self.get_feed_content(feed.id)["items"]]
-            feed.feed_items = []
-            for item in feed_items:
-                new_item = Storage()
-                new_item.title = item.title
-                new_item.content = item.summary.get("content")
-                new_item.link = item.alternate[0]["href"] if item.alternate else ""
-                new_item.author = item.author
-                new_item.guid = item.id
-                new_item.pubDate = datetime(1, 1, 1) + timedelta(microseconds=item.published)
-                new_item.unread = item.unread
-                new_item.keywords = item.keywords
-                new_item.image = item.enclosure[0]["href"] if item.enclosure else item.visual["url"] if item.visual else ""
-                feed.feed_items += [new_item]
-
-        return feeds
+            feed.pubDate = datetime(1970, 1, 1) + timedelta(milliseconds=feed.updated) if feed.updated else ""
+            news_dics += [Storage(item) for item in self.get_feed_content(feed.id)["items"]]
+        return news_dics
     
-    def get_feed_content(self, streamId, unreadOnly=True, newerThan=0):
+    def get_feed_content(self, streamId, unreadOnly=True, newerThan=int((datetime.now()-timedelta(days=2)-datetime(1970,1,1)).total_seconds()*1000)):
         '''return contents of a feed'''
-        headers = {'Authorization': 'OAuth '+ self.access_token}
+        # headers = {'Authorization': 'OAuth '+ self.access_token}  # authorization is optional!
+        headers = {}
         quest_url=self._get_endpoint('v3/streams/contents')
         params = dict(
+                      count=1000,
                       streamId=streamId,
                       unreadOnly=unreadOnly,
                       newerThan=newerThan
                       )
-        res = requests.get(url=quest_url, params=params,headers=headers)
+        res = requests.get(url=quest_url, params=params, headers=headers)
         return res.json()
     
-    def mark_article_read(self, access_token, entryIds):
+    def mark_article_read(self, entryIds):
         '''Mark one or multiple articles as read'''
         headers = {'content-type': 'application/json',
-                   'Authorization': 'OAuth ' + access_token
+                   'Authorization': 'OAuth ' + self.access_token
         }
         quest_url = self._get_endpoint('v3/markers')
-        params = dict(
-                      action="markAsRead",
-                      type="entries",
-                      entryIds=entryIds,
-                      )
-        res = requests.post(url=quest_url, data=json.dumps(params), headers=headers)
-        return res
+
+        ## Can only mark up to 1000 articels at once ##
+        for chunk in [entryIds[x:x+1000] for x in xrange(0, len(entryIds), 1000)]:
+            params = dict(
+                          action="markAsRead",
+                          type="entries",
+                          entryIds=chunk,
+                          )
+            requests.post(url=quest_url, data=json.dumps(params), headers=headers)
     
     def save_for_later(self, access_token, user_id, entryIds):
         '''saved for later.entryIds is a list for entry id.'''
