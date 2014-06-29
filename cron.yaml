@@ -1,0 +1,4 @@
+cron:
+- description: daily summary job
+  url: /welcome/feedly/update_news
+  schedule: every 30 minutes

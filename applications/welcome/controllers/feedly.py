@@ -22,3 +22,9 @@ def index():
             feedly_client.access_token = request.vars.access_token
 
     return dict(news=News.get())
+
+def update_news():
+    news = [News.from_dict(news_dic) for news_dic in feedly_client.get_news_dics()]
+    print "Putting %s news" % len(news)
+    ndb.put_multi(news)
+    feedly_client.mark_article_read([n.key.id() for n in news])

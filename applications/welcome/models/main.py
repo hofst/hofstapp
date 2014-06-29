@@ -7,6 +7,7 @@ from gluon.storage import Storage
 from datetime import datetime, timedelta
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
+from google.appengine.api import taskqueue
 import logging
 from pprint import pprint
 from collections import OrderedDict
@@ -65,12 +66,7 @@ class News(ndb.Model):
 
     @staticmethod
     def get():
-        if not News.QUERY().get() or datetime.now() - News.QUERY().get().datetime > timedelta(minutes=30):  # refresh every 30min
-            news = [News.from_dict(news_dic) for news_dic in feedly_client.get_news_dics()]
-            print "Putting %s news" % len(news)
-            ndb.put_multi(news)
-            feedly_client.mark_article_read([n.key.id() for n in news])
-
+        return News.QUERY().fetch()
         news = OrderedDict()
 
         for n in News.QUERY().fetch():
