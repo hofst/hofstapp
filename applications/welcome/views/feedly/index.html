@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<rss version="2.0">
+<channel>
+    <title>{{=feeds[0].title}}</title>
+    <link>{{=feeds[0].website}}</link>
+    <description>{{=feeds[0].title}}</description>
+    <pubDate>{{=feeds[0].pubDate}}</pubDate>
+    {{for feed in feeds:}}
+            {{for item in feed.feed_items:}}
+                <item>
+                    <title>{{=item.title}}</title>
+                    <description>{{=item.content}}</description>
+                    <link>{{=item.link}}</link>
+                    <author>{{=item.author}}</author>
+                    <guid>{{=item.guid}}</guid>
+                    <pubDate>{{=item.pubDate}}</pubDate>
+                    <unread>{{=item.unread}}</unread>
+                    <keywords>{{=",".join(item.keywords)}}</keywords>
+                    <image>{{=item.image}}</image>
+                </item>
+            {{pass}}
+    {{pass}}
+</channel>
+</rss>
