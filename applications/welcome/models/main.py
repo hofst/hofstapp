@@ -46,7 +46,7 @@ class News(ndb.Model):
 
     @staticmethod
     def QUERY():
-        return News.query(News.crawled > datetime.now() - timedelta(days=2)).order(-News.pubDate)
+        return News.query(News.crawled > datetime.now() - timedelta(days=2)).order(-News.crawled)
 
     @staticmethod
     def from_dict(dic):
