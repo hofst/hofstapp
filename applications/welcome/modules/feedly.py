@@ -61,7 +61,7 @@ class FeedlyClient(object):
         return res.json()
 
     def get_subscriptions(self):
-        '''return list of user subscriptions'''
+        '''return list of user subscriptions  '''
         headers = {'Authorization': 'OAuth ' + self.access_token}
         quest_url = self._get_endpoint('v3/subscriptions')
         res = requests.get(url=quest_url, headers=headers).json()
@@ -80,8 +80,7 @@ class FeedlyClient(object):
     
     def get_feed_content(self, streamId, unreadOnly=True, newerThan=int((datetime.now()-timedelta(days=2)-datetime(1970,1,1)).total_seconds()*1000)):
         '''return contents of a feed'''
-        # headers = {'Authorization': 'OAuth '+ self.access_token}  # authorization is optional!
-        headers = {}
+        headers = {'Authorization': 'OAuth '+ self.access_token}  # authorization is optional!
         quest_url=self._get_endpoint('v3/streams/contents')
         params = dict(
                       count=1000,

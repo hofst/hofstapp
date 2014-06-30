@@ -92,3 +92,7 @@ builtins:
 - appstats: on
 - admin_redirect: on
 - deferred: on
+
+libraries:
+- name: lxml
+  version: latest

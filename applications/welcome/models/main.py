@@ -11,6 +11,9 @@ from google.appengine.api import taskqueue
 import logging
 from pprint import pprint
 from collections import OrderedDict
+from Scraper import Scraper
+from rss_mappings import get_rss_content
+
 memcache = memcache.Client(pickleProtocol=1)
 
 FEEDLY_REDIRECT_URI = "http://localhost"
