@@ -24,7 +24,10 @@ def index():
     return dict(news=News.get())
 
 def update_news():
+    existing_news = set(News.query(News.datetime > datetime.now() - timedelta(days=2)).fetch(keys_only=True))
+    print "Existing news: %s" % len(existing_news)
     news = [News.from_dict(news_dic) for news_dic in feedly_client.get_news_dics()]
+    news = [n for n in news if n.key not in existing_news]
     print "Putting %s news" % len(news)
     ndb.put_multi(news)
     for n in news:
