@@ -13,18 +13,9 @@ from pprint import pprint
 from collections import OrderedDict
 from Scraper import Scraper
 from rss_mappings import get_rss_content
-import os
+from feedly_credentials import *
 
 memcache = memcache.Client(pickleProtocol=1)
-is_local = os.environ['SERVER_SOFTWARE'].find('Development') >= 0
-
-FEEDLY_REDIRECT_URI = "http://localhost"
-FEEDLY_CLIENT_ID="sandbox"
-FEEDLY_CLIENT_SECRET="ES3R6KCEG46BW9MYD332"
-if is_local:
-    FEEDLY_ACCESS_TOKEN="AjaGzax7ImEiOiJGZWVkbHkgRGV2ZWxvcGVyIiwiZSI6MTQxMTgxMTU2MDIxOSwiaSI6IjUwZjJiYzYxLTkwY2QtNDcwNC1iNmJhLWY2N2UyZTg2MThiNCIsInAiOjYsInQiOjEsInYiOiJwcm9kdWN0aW9uIiwieCI6InN0YW5kYXJkIn0:feedlydev"  # sebastian@hofst.com
-else:
-    FEEDLY_ACCESS_TOKEN = "AjPNcgp7ImEiOiJGZWVkbHkgRGV2ZWxvcGVyIiwiZSI6MTQxMTc2NTg1ODE2OSwiaSI6ImY2ZmI4ZWEzLTBjNDItNDMwYy04M2RkLWM0MzViNThjYzMyZCIsInAiOjYsInQiOjEsInYiOiJwcm9kdWN0aW9uIiwieCI6InN0YW5kYXJkIn0:feedlydev"  # basti@katseb.de
 
 if FEEDLY_ACCESS_TOKEN:
     feedly_client = FeedlyClient(access_token=FEEDLY_ACCESS_TOKEN, sandbox=False)
