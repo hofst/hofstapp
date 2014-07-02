@@ -26,6 +26,9 @@ else:
         sandbox=True
     )
 
+class Subscriptions(ndb.Model):
+    pass
+
 class News(ndb.Model):
     datetime = ndb.DateTimeProperty(auto_now_add=True)
     origin_id = ndb.StringProperty()

@@ -38,3 +38,9 @@ def get_content():
     news = ndb.Key(urlsafe=request.vars.news_key).get()
     news.content = get_rss_content(news.origin_stream_id, news.link) or news.content
     news.put()
+
+def schedule_update_news():
+    try:
+        taskqueue.add(url="/welcome/feedly/update_news", name="update_news")
+    except:
+        pass

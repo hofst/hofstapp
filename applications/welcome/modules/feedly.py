@@ -88,7 +88,7 @@ class FeedlyClient(object):
                       unreadOnly=unreadOnly,
                       newerThan=newerThan
                       )
-        res = requests.get(url=quest_url, params=params, headers=headers)
+        res = requests.get(url=quest_url, params=params, headers=headers, timeout=60)
         return res.json()
     
     def mark_article_read(self, entryIds):

@@ -2,16 +2,16 @@
 
 <rss version="2.0">
 <channel>
-    <title>Hofstapp Feeds</title>
+    <title>news</title>
     <link>http://hofst.com</link>
     <description>Better than Feedly!</description>
     <pubDate>{{=datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}}</pubDate>
     {{for n in news:}}
         <item>
             <title>{{=n.title}}</title>
-            <description>{{=n.content}}</description>
+            <description>{{=n.origin_title + ": \n" + n.content}}</description>
             <link>{{=n.link}}</link>
-            <author>{{=n.author}}</author>
+            <author>{{=n.author or n.origin_title}}</author>
             <guid>{{=n.key.id()}}</guid>
             <pubDate>{{=n.pubDate.strftime("%Y-%m-%dT%H:%M:%S")}}</pubDate>
             <image>{{=n.image}}</image>
