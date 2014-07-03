@@ -13,7 +13,7 @@ class Scraper(object):
         if not selectors:
             return html_src  # nothing to do
 
-        parsed_tree = html.document_fromstring(html_src)
+        parsed_tree = html.document_fromstring(html_src.decode)
 
         selectors_results = []
         for selector in selectors:
@@ -62,7 +62,7 @@ class Scraper(object):
     @staticmethod
     def http_request(url, selectors=None, session=None):
         """ Returns the response of an http get-request to a given url """
-        logging.warning(url)  # For Debugging purposes
+        logging.warning(url + repr(selectors))  # For Debugging purposes
         session = session or Session()
         html_src = session.get(url).text
         return Scraper.parse(html_src, selectors=selectors)

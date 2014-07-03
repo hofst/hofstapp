@@ -1,6 +1,7 @@
 __author__ = 'Basti'
 from Scraper import Scraper
 from gluon.storage import Storage
+import logging
 
 rss_mappings = {
  u'feed/http://www.thenakedscientists.com/naked_scientists_podcast.xml': '//p[@class="bodytext"]//text()',
@@ -50,13 +51,14 @@ rss_mappings = {
  u'feed/http://www.manager-magazin.de/news/index.rss': '//div[@class="mmArticleColumnInner"]//p//text()',
  u'feed/http://rss.sueddeutsche.de/rss/Eilmeldungen': '//section[@class="body"]//p//text()',
  u'feed/http://suche.sueddeutsche.de/rss/Topthemen': '//section[@class="body"]//p//text()',
+ u'feed/http://www.in.tum.de/index.php?id=198&type=100': '//div[@id="maincontent"]//p//text()',
 }
 
 def get_rss_content(stream_id, link):
     if stream_id not in rss_mappings or not rss_mappings[stream_id]:
         return ""
-
-    if hasattr(rss_mappings[stream_id], "__call__"):
-        return rss_mappings[stream_id](link)
-    else:
+    try:
         return reduce(lambda x,y: x+y[0],Scraper.http_request(link, selectors=[Storage(xpath=rss_mappings[stream_id])]), "")
+    except ValueError as e:
+        logging.error(e.message)
+        return ""
