@@ -13,7 +13,7 @@
             <link>{{=n.link}}</link>
             <author>{{=n.author or n.origin_title}}</author>
             <guid>{{=n.key.id()}}</guid>
-            <pubDate>{{=n.pubDate.strftime("%Y-%m-%dT%H:%M:%S")}}</pubDate>
+            <pubDate>{{=n.crawled.strftime("%Y-%m-%dT%H:%M:%S")}}</pubDate>
             <image>{{=n.image}}</image>
         </item>
     {{pass}}
