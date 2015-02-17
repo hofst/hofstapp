@@ -2,7 +2,7 @@ __author__ = 'Basti'
 
 from feedly import FeedlyClient
 import stopwords
-from rss_mappings import get_rss_content
+import rss_mappings
 from feedly_credentials import *
 
 if FEEDLY_ACCESS_TOKEN:
@@ -26,7 +26,7 @@ class News(ndb.Model):
     author = ndb.StringProperty(indexed=False)
     crawled = ndb.DateTimeProperty()
     unread = ndb.BooleanProperty(indexed=False)
-    image = ndb.TextProperty(indexed=False)
+    image = ndb.StringProperty(indexed=False)
 
     @staticmethod
     def QUERY():
@@ -51,6 +51,7 @@ class News(ndb.Model):
     @staticmethod
     def get():
         return News.QUERY().fetch()
+
         news = OrderedDict()
 
         for n in News.QUERY().fetch():
@@ -86,28 +87,30 @@ def index():
     return dict(news=News.get())
 
 
-def update_news():
+def schedule_fetch_news():
+    taskqueue.add(url="/welcome/feedly/fetch_news")
+
+
+def fetch_news():
     news = [News.from_dict(news_dic) for news_dic in feedly_client.get_news_dics()]
     existing_news = set(News.query(News.datetime > datetime.now() - timedelta(days=2)).fetch(keys_only=True))
     print "Existing news: %s" % len(existing_news)
 
     # Remove existing news
     news = [n for n in news if n.key not in existing_news]
+    ndb.put_multi(news)
     print "Putting %s news" % len(news)
 
-    ndb.put_multi(news)
+    # Rescrap news
     for n in news:
-        taskqueue.add(url="/welcome/feedly/get_content", params={"news_key": n.key.urlsafe()})
+        taskqueue.add(url="/welcome/feedly/rescrap_news", params={"news_key": n.key.urlsafe()})
+
+    # Mark News as read
     feedly_client.mark_article_read([n.key.id() for n in news])
 
 
-def get_content():
-    news = ndb.Key(urlsafe=request.vars.news_key).get()
-    content = get_rss_content(news.origin_stream_id, news.link)
-    if content:
-        news.content = content
-        news.put()
+def rescrap_news():
+    n = ndb.Key(urlsafe=request.vars.news_key).get()
+    rss_mappings.rescrap_news(n)
 
 
-def schedule_update_news():
-    taskqueue.add(url="/welcome/feedly/update_news")

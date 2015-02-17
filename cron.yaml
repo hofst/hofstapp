@@ -1,4 +1,4 @@
 cron:
 - description: daily summary job
-  url: /welcome/feedly/schedule_update_news
+  url: /welcome/feedly/schedule_fetch_news
   schedule: every 1 hours
