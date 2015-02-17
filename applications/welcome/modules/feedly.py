@@ -76,7 +76,7 @@ class FeedlyClient(object):
         feeds = self.get_subscriptions()
         for feed in feeds:
             feed.pubDate = datetime(1970, 1, 1) + timedelta(milliseconds=feed.updated) if feed.updated else ""
-            news_dics += [Storage(item) for item in self.get_feed_content(feed.id)["items"]]
+            news_dics += [Storage(item) for item in self.get_feed_content(feed.id)["items"][:1]]  # TODO !!!!!!!!!!!!!!!!!!!!!!!!!
         return news_dics
 
     def get_feed_content(self, streamId, unreadOnly=True, newerThan=int((datetime.now() - timedelta(days=2) - datetime(1970, 1, 1)).total_seconds() * 1000)):

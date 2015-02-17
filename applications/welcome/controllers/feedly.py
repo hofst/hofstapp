@@ -112,5 +112,3 @@ def fetch_news():
 def rescrap_news():
     n = ndb.Key(urlsafe=request.vars.news_key).get()
     rss_mappings.rescrap_news(n)
-
-
