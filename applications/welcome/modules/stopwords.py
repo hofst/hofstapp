@@ -1,5 +1,7 @@
-# -*- coding: UTF-8 -*-
-__author__ = 'Basti'
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+__author__ = 'Sebastian Hofstetter'
 
 import re
 from stemming.porter2 import stem

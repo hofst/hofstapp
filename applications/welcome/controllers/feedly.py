@@ -1,4 +1,7 @@
-__author__ = 'Basti'
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+__author__ = 'Sebastian Hofstetter'
 
 from feedly import FeedlyClient
 import stopwords

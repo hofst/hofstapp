@@ -8,10 +8,10 @@
     <pubDate>{{=datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}}</pubDate>
     {{for n in news:}}
         <item>
-            <title>{{=n.title}}</title>
-            <description>{{=n.origin_title + ": \n" + n.content}}</description>
+            <title>{{=s(n.title)}}</title>
+            <description>{{=s(n.origin_title + ": <br>" + n.content)}}</description>
             <link>{{=n.link}}</link>
-            <author>{{=n.author or n.origin_title}}</author>
+            <author>{{=s(n.author or n.origin_title)}}</author>
             <guid>{{=n.key.id()}}</guid>
             <pubDate>{{=n.crawled.strftime("%Y-%m-%dT%H:%M:%S")}}</pubDate>
             <image>{{=n.image}}</image>

@@ -1,4 +1,8 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+__author__ = 'Sebastian Hofstetter'
+
 import requests
 import json
 from datetime import datetime, timedelta
