@@ -85,11 +85,10 @@ def make_url_absolute(top_url, relative_url):
 def rescrap_news(n):
     mapping = rss_mappings.get(n.origin_stream_id, None)
     if mapping:
-        logging.info(n.link)
-        html_src = requests.get(n.link).content
-        parsed_tree = html.document_fromstring(html_src)
-
         try:
+            logging.info(n.link)
+            html_src = requests.get(n.link).content
+            parsed_tree = html.document_fromstring(html_src)
             if "redirect" in mapping:
                 red = parsed_tree.xpath(mapping["redirect"])[0]
                 n.link = make_url_absolute(n.link, red)
