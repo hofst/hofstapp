@@ -53,15 +53,7 @@ class News(ndb.Model):
 
     @staticmethod
     def get():
-        news = News.QUERY().fetch()
-
-        for n in news:
-            import HTMLParser
-            n.content = HTMLParser.HTMLParser().unescape(n.content)
-            if "Ã" in n.content in n.content:
-                n.content = n.content.encode('latin-1').decode('utf-8')
-
-        return news
+        return News.QUERY().fetch()
 
         news = OrderedDict()
 

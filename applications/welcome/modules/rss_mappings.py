@@ -87,18 +87,18 @@ def rescrap_news(n):
     if mapping:
         try:
             logging.info(n.link)
-            html_src = requests.get(n.link).content
+            html_src = requests.get(n.link).text
             parsed_tree = html.document_fromstring(html_src)
             if "redirect" in mapping:
                 red = parsed_tree.xpath(mapping["redirect"])[0]
                 n.link = make_url_absolute(n.link, red)
                 logging.info(n.link)
-                html_src = requests.get(n.link).content
+                html_src = requests.get(n.link).text
                 parsed_tree = html.document_fromstring(html_src)
 
             if "content" in mapping:
                 nodes = parsed_tree.xpath(mapping["content"])
-                n.content = " <br> ".join([etree.tostring(node) for node in nodes])
+                n.content = " <br> ".join([etree.tostring(node, encoding=unicode) for node in nodes])
 
             if "image" in mapping:
                 n.image = parsed_tree.xpath(mapping["image"])[0]
