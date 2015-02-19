@@ -8,7 +8,7 @@ import requests
 from lxml import etree, html
 
 rss_mappings = {
-    u'feed/http://www.thenakedscientists.com/naked_scientists_podcast.xml': dict(content='//ul[contains(@class, "result")]', image='//img[contains(@class, "teaser")]/@src', redirect='//h4/a[contains(@href, "transcript")]/@href'),
+    u'feed/http://www.thenakedscientists.com/naked_scientists_podcast.xml': dict(content='//div[@class="ns-content-box-inner"]', image='//img[contains(@class, "teaser")]/@src'),
     u'feed/http://feeds.feedburner.com/ClPlBl': dict(image='//img[@class="header-logo1"]/@src'),
     u'feed/http://www.heise.de/newsticker/heise-atom.xml': dict(content='//div[@class="meldung_wrapper"]', image='//figure[@class="aufmacherbild"]/img/@src'),
     u'feed/http://dzone.com/mz/agile/rss': dict(content='(//div[@class="content"])[1]', image='id("logo-dzone-new")/a/img/@src'),
@@ -89,21 +89,28 @@ def rescrap_news(n):
             logging.info(n.link)
             html_src = requests.get(n.link).text
             parsed_tree = html.document_fromstring(html_src)
+
             if "redirect" in mapping:
                 red = parsed_tree.xpath(mapping["redirect"])[0]
                 n.link = make_url_absolute(n.link, red)
-                logging.info(n.link)
-                html_src = requests.get(n.link).text
-                parsed_tree = html.document_fromstring(html_src)
+            else:
+                if "content" in mapping:
+                    nodes = parsed_tree.xpath(mapping["content"])
+                    n.content = " <br> ".join([etree.tostring(node, encoding=unicode) for node in nodes])
 
-            if "content" in mapping:
-                nodes = parsed_tree.xpath(mapping["content"])
-                n.content = " <br> ".join([etree.tostring(node, encoding=unicode) for node in nodes])
-
-            if "image" in mapping:
-                n.image = parsed_tree.xpath(mapping["image"])[0]
-                n.image = make_url_absolute(n.link, n.image)
+                if "image" in mapping:
+                    n.image = parsed_tree.xpath(mapping["image"])[0]
+                    n.image = make_url_absolute(n.link, n.image)
 
         except Exception as e:
             logging.error(e.message)
         n.put()
+
+
+def test():
+    class News(object):
+        pass
+    n = News()
+    n.origin_stream_id = 'feed/http://rivva.de/rss.xml'
+    n.link = "http://rivva.de/257640418"
+    rescrap_news(n)
